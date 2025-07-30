@@ -1,5 +1,3 @@
-Of course! Here's your friendly 💻 API guide all wrapped up in Markdown for easy copy-paste or saving as `README.md`:
-
 ```markdown
 # 🚀 Go PostgreSQL User API
 
