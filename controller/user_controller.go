@@ -3,11 +3,46 @@ package controller
 import (
     "net/http"
     "encoding/json"
+    "os"
+    "strings"
+    "strconv"
+    "github.com/golang-jwt/jwt/v5"
     "yourapp/service"
+    "yourapp/model"
 )
 
 type UserController struct {
     Service *service.UserService
+}
+
+// JWT authentication middleware
+func (c *UserController) Authenticate(next http.HandlerFunc) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        tokenString := r.Header.Get("Authorization")
+        if tokenString == "" {
+            http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+            return
+        }
+        tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+        decryptionKey := r.Header.Get("X-JWT-KEY")
+        if decryptionKey == "" {
+            http.Error(w, "Missing X-JWT-KEY header", http.StatusUnauthorized)
+            return
+        }
+
+        // Use the provided key to validate the JWT (HMAC example)
+        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+            // Optionally, combine with private key from env
+            privateKey := os.Getenv("JWT_PRIVATE_KEY")
+            return []byte(decryptionKey + privateKey), nil
+        })
+        if err != nil || !token.Valid {
+            http.Error(w, "Invalid token", http.StatusUnauthorized)
+            return
+        }
+        next(w, r)
+    }
 }
 
 func (c *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {

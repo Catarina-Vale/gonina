@@ -105,3 +105,42 @@ http://localhost:8080/users/update
 ```bash
 curl -X DELETE "http://localhost:8080/users/delete?id=1"
 ```
+
+---  
+
+## 🔐 JWT Authentication
+
+All API endpoints require JWT authentication.
+
+### 1. Set Up Your JWT Private Key
+
+Create a `.env` file in your project root with:
+
+```env
+JWT_PRIVATE_KEY=your_super_secret_private_key_here
+```
+
+Replace `your_super_secret_private_key_here` with a secure, random string.
+
+### 2. Required Headers
+
+For every API request, include:
+
+- `Authorization: Bearer <your_jwt_token>`
+- `X-JWT-KEY: <your_decryption_key>`
+
+The server will validate the JWT using a combination of your provided key and the private key from the environment.
+
+### 3. Example `curl` Command
+
+```bash
+curl -X GET http://localhost:8080/users \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "X-JWT-KEY: <your_decryption_key>"
+```
+
+Replace `<your_jwt_token>` and `<your_decryption_key>` with your actual values.
+
+> ⚠️ All endpoints (`/users`, `/users/create`, `/users/update`, `/users/delete`) require these headers for authentication.
+
+---
